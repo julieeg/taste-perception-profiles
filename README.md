@@ -1,2 +1,2 @@
-# taste-profiles
-This repository will summarize the R code to derive taste perception profiles using data-driven clustering
+# taste-perception-profiles
+This repository includes the relevant R code and a simulated dataset to conduct the data-driven clustering approach to derive taste perception profiles.
