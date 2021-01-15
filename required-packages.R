@@ -5,7 +5,8 @@
 #######################################################################################################################
 
 ## Create a list of all required packages ----------------------------------------------------------------------------
-list.of.packages <- c("fmsb",		
+list.of.packages <- c("dplyr",
+                      "fmsb",		
                       "cluster",	
                       "pryr",		
                       "NbClust",	
@@ -20,21 +21,25 @@ list.of.packages <- c("fmsb",
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 
 ## Install new.packages ----------------------------------------------------------------------------------------------
-if(length(new.packages)){install.packages(new.package)}
+if((new.packages)){install.packages(new.package)}
+
+## Load list.of.packages
+lapply(list.of.packages, require, character.only=T)
 
 #=====================================================================================================================
 ## Rationale for each required packages, in context of the Workflow
 #=====================================================================================================================
 
-fmsb       # for kmeans function
-cluster    # for gap statistic and silhouette plots
-pryr       # for storing plot objects (sections of R code) in base R
-NbClust    # for Internal Cluster Validity indices
-class      # for k-nearest neighbors  
-fossil     # for adjusted rand index 
-rcompanion # for cramer's V
-plyr       # for rename function 
-fpc        # for jaccard index
+      # dplyr      for data manipulation
+      # fmsb       for kmeans function
+      # cluster    for gap statistic and silhouette plots
+      # pryr       for storing plot objects (sections of R code) in base R
+      # NbClust    for Internal Cluster Validity indices
+      # class      for k-nearest neighbors  
+      # fossil     for adjusted rand index 
+      # rcompanion for cramer's V
+      # plyr       for rename function 
+      # fpc        for jaccard index
 
 
 #####################################################################################################################
@@ -42,7 +47,7 @@ fpc        # for jaccard index
 #####################################################################################################################
 
 ## Read in data & save data as simdata ------------------------------------------------------------------------------
-simdata <- read.csv("Data/simdata1.csv", header = TRUE, stringsAsFactors = FALSE)
+simdata <- read.csv("Raw Data File/Supplemental_Data.csv", header = TRUE, stringsAsFactors = FALSE)
 
 ## Drop “ID” column and save as mydata ------------------------------------------------------------------------------
 mydata <- simdata %>% select(sweet, 
