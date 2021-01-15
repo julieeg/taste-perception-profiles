@@ -8,13 +8,13 @@
 ## Set up objects & Prepare
 #=======================================================================================================================
 
-## Set plot parameters and margins ----------------------------------------------------------------------------
+## Set plot parameters and margins -------------------------------------------------------------------------------------
 par(mfrow=c(1,1), mar=c(5.1,5.1,4.1,2.1), xpd=T)
 
-## Create a list of Ck values to run for each reproducibility index ---------------------------------------------
+## Create a list of Ck values to run for each reproducibility index ----------------------------------------------------
 Cks<-(2:10)
 
-## Create a list of colors for side-by-side boxplots ---------------------------------------------------------
+## Create a list of colors for side-by-side boxplots -------------------------------------------------------------------
 Greys<-c("#A0A0A0", "#404040")
 
 
@@ -33,7 +33,7 @@ wardD.fun<-function(data, Ck){
 ## Create dataframe with only the 5 tastes for cluster analysis (only the 5 tastes) ------------------------------------
 mydata1<-mydata[,1:5]
 
-## write function to run SHCV for any given cluster algorithm and Ck -----------------------------------------
+## write function to run SHCV for any given cluster algorithm and Ck ---------------------------------------------------
 shcv.fun<-function(data, Ck, FUN){
   # Create temporary matrix to store data; 20 rows (20 estimates for each index) x 2 cols (1 for each index)
   temp<-matrix(NA,20,2, dimnames = list(c(1:20), c(paste("ARI.", Ck, sep=""), 
@@ -45,7 +45,6 @@ shcv.fun<-function(data, Ck, FUN){
     train.n<-sample(nrow(data), nrow(data)*0.5, replace=F) 
     train.dat<-data[train.n,]; test.dat<-data[-(train.n),]
     
-    ######################################################
     # 2. Run cluster algorithm on train.dat
     train.clust<-FUN(train.dat, Ck)
     
@@ -59,16 +58,17 @@ shcv.fun<-function(data, Ck, FUN){
     ## a. store data in "temp" matrix
     temp[i,1]<- adj.rand.index(test.clust, as.numeric(test.knn))
     temp[i,2]<- cramerV(test.clust, as.numeric(test.knn))
-    ######################################################
     
     # 6.Repeate steps 2-5 using test sample as the "train" sample
     test.clust<-FUN(test.dat, Ck)
     train.knn<-knn(test.dat, train.dat, cl=test.clust, Ck, use.all = T, prob=T, l=0.5)
     train.clust<-FUN(train.dat, Ck)
+    
     ## a. store data temporarily
     temp[i+10,1]<- adj.rand.index(train.clust, as.numeric(train.knn))
     temp[i+10,2]<- cramerV(train.clust, as.numeric(train.knn))
   }
+  
   # Print temp matrix with 20 estimates for each index per alg for each 
   return(temp)
 }
@@ -78,14 +78,14 @@ shcv.fun<-function(data, Ck, FUN){
 ## Run SHCV for each Ck; store results separately for each index 
 #=======================================================================================================================
 
-## create matrices for storage -------------------------------------------------------------------------
+## create matrices for storage -----------------------------------------------------------------------------------------
 ### 40 rows (20 per algorithm) x 10 columns (1 per Ck, from 2-10)
 ari.dat<-matrix(c(rep(1,20), rep(2,20)),40,10,
                 dimnames = list(1:40, c(paste("Ck.", 2:10, sep=""), "alg")))
 cramv.dat<-matrix(c(rep(1,20), rep(2,20)),40,10,
                   dimnames = list(1:40, c(paste("Ck.", 2:10, sep=""), "alg")))
 
-## se for loop to run SHCV for each index, for Cks from 2:10 -------------------------------------------
+## Use for loop to run SHCV for each index, for Cks from 2:10 -----------------------------------------------------------
 for (Ck in Cks){
   set.seed(2468)
   temp.kca<-shcv.fun(mydata1, Ck, kca.fun)  
@@ -94,7 +94,7 @@ for (Ck in Cks){
   cramv.dat[,Ck-1]<-cbind(temp.kca[,2], temp.wardD[,2])
 }
 
-## save ari.dat and cramv.dat as .rda files ---------------------------------------------------------
+## save ari.dat and cramv.dat as .rda files ----------------------------------------------------------------------------
 saveRDS(as.data.frame(ari.dat), file = "Output/P2.Tab_ARI.rda")
 saveRDS(cramv.dat, file = "Output/P2.Tab_CramV.rda")
 
@@ -103,14 +103,14 @@ saveRDS(cramv.dat, file = "Output/P2.Tab_CramV.rda")
 ## Visualize data using side-by-side boxplot
 #=======================================================================================================================
 
-## Convert each matrix to long format and "alg" (algorithm) to a factor var -------------
+## Convert each matrix to long format and "alg" (algorithm) to a factor var --------------------------------------------
 ari.l.dat<-reshape(as.data.frame(ari.dat), varying = list(colnames(ari.dat)[1:9]),
                    timevar = "Ck", v.names = "ARI", direction = "long")
 cramv.l.dat<-reshape(as.data.frame(cramv.dat), varying = list(colnames(cramv.dat)[1:9]),
                      timevar = "Ck", v.names = "CramV", direction = "long")
 
 
-## A. Adjusted Rand Index --------------------------------------------------------------
+## A. Adjusted Rand Index ----------------------------------------------------------------------------------------------
 ari.sum.plot %<a-% {
   with(ari.l.dat,
        boxplot(ARI~alg, col=Greys, frame=T, axes=F, ylim=c(0,0.9),
@@ -120,12 +120,10 @@ ari.sum.plot %<a-% {
   axis(side=2, at=seq(0,0.9,0.1))
   }
 
-## Print ari summary box plot -----------------------------------------------------------
+## Print ari summary box plot ------------------------------------------------------------------------------------------
 ari.sum.plot
 
-#### B. Cramer’s V ###########################################################################
-
-## Summarize CramV data across all values of Ck------------------------------------------
+## B. Cramer’s V -------------------------------------------------------------------------------------------------------
 cramv.sum.plot %<a-% {
   with(cramv.l.dat,
        boxplot(CramV~alg, col=Greys, frame=T, axes=F, ylim=c(0.2,0.92),
@@ -135,16 +133,19 @@ cramv.sum.plot %<a-% {
   axis(side=2, at=seq(0.2,0.92,0.1))
 }
 
-## Print CramV Summary Box Plot ---------------------------------------------------------
+## Print CramV Summary Box Plot ----------------------------------------------------------------------------------------
 cramv.sum.plot
 
-## Create 2 Panel Figure ----------------------------------------------------------------
+## Create 2 Panel Figure -----------------------------------------------------------------------------------------------
 panel.repro.plot %<a-%{
   par(mar=c(5.1,5.1,4.1,2.1), mfrow=c(1,2))
   ari.sum.plot
   cramv.sum.plot
 }
 
-## Print panel plot of reproducibility indices ------------------------------------------
+## Print panel plot of reproducibility indices ----------------------------------------------------------------------------
 panel.repro.plot
+
+
+## END OF SYNTAX ##
 
