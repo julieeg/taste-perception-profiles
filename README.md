@@ -1,7 +1,11 @@
-This repository includes the relevant R code and a simular dataset for deriving taste perception profiles from sweet, salt, sour, bitter and umami 
-perceptin scores using a data-driven clustering approach. 
+Relevant R code and a simulated dataset for deriving taste perception profiles from sweet, salt, sour, bitter and umami 
+perception scores using a data-driven clustering approach. 
 
-##### List of Abbreviations:
+##### Included files 
+
+
+
+##### List of Abbreviations
 ARI = adjusted rand index (reproducibility index)    
 CH = calinski-harabasz index   
 Ck = number of clusters in a cluster solution    
