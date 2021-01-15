@@ -16,9 +16,11 @@ list.of.packages <- c("fmsb",
                       "fpc")
 
 
-## Select & install packages from list.of.packages that are not already installed -------------
-new.packages<-list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
-if(length(new.packages)) install.packages(new.package)
+## Select packages from list.of.packages that are not already installed ------------------------
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+
+## Install new.packages ------------------------------------------------------------------------
+if(length(new.packages)){install.packages(new.package)}
 
 #===============================================================================================
 ## Rationale for each required packages, in context of the Workflow
@@ -43,7 +45,11 @@ fpc        # for jaccard index
 simdata <- read.csv("Data/simdata1.csv", header = TRUE, stringsAsFactors = FALSE)
 
 ## Drop “ID” column and save as mydata ----------------------------------------------------------
-mydata <- simdata[,2:6] 
+mydata <- simdata %>% select(sweet, 
+                             salt,
+                             sour,
+                             bitter,
+                             umami)
 
 ## Create "total taste score” as the sum of all 5 perception scores ----------------------------- 
 mydata$tot_taste <- with(mydata, (sweet+salt+sour+bitter+umami))
