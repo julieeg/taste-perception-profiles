@@ -21,7 +21,7 @@ list.of.packages <- c("dplyr",
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 
 ## Install new.packages ----------------------------------------------------------------------------------------------
-if((new.packages)){install.packages(new.package)}
+if(length(new.packages)){install.packages(new.package)}
 
 ## Load list.of.packages
 lapply(list.of.packages, require, character.only=T)
