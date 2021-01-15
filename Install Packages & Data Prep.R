@@ -40,12 +40,12 @@ fpc        # for jaccard index
 #################################################################################################
 
 ## Read in data & save data as simdata ----------------------------------------------------------
-simdata<-read.csv("Data/simdata1.csv", header = TRUE, stringsAsFactors = FALSE)
+simdata <- read.csv("Data/simdata1.csv", header = TRUE, stringsAsFactors = FALSE)
 
 ## Drop “ID” column and save as mydata ----------------------------------------------------------
-mydata<-simdata[,2:6] 
+mydata <- simdata[,2:6] 
 
 ## Create "total taste score” as the sum of all 5 perception scores ----------------------------- 
-mydata$tot_taste<-with(mydata, (sweet+salt+sour+bitter+umami))
+mydata$tot_taste <- with(mydata, (sweet+salt+sour+bitter+umami))
 
 ## END OF SYNTAX ##
