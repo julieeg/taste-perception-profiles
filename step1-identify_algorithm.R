@@ -95,8 +95,8 @@ for (Ck in Cks){
 }
 
 ## save ari.dat and cramv.dat as .rda files ----------------------------------------------------------------------------
-saveRDS(as.data.frame(ari.dat), file = "Output/P2.Tab_ARI.rda")
-saveRDS(cramv.dat, file = "Output/P2.Tab_CramV.rda")
+saveRDS(as.data.frame(ari.dat), file = "Output/Dat.ARI.rda")
+saveRDS(cramv.dat, file = "Output/Dat.CramV.rda")
 
 
 #=======================================================================================================================
@@ -116,7 +116,7 @@ ari.sum.plot %<a-% {
        boxplot(ARI~alg, col=Greys, frame=T, axes=F, ylim=c(0,0.9),
                boxwex = 0.5, varwidth=F, ylab="ARI",
                xlab=NA, cex.lab=1.15, cex.main=1.25))
-  axis(side=1, at=c(1,2), labels = c("K-means", "Ward's D"))
+  axis(side=1, at=c(1,2), labels = c("KCA", "Ward's D"))
   axis(side=2, at=seq(0,0.9,0.1))
   }
 
@@ -129,7 +129,7 @@ cramv.sum.plot %<a-% {
        boxplot(CramV~alg, col=Greys, frame=T, axes=F, ylim=c(0.2,0.92),
                boxwex = 0.5, varwidth=F, ylab="Cramer's V",
                xlab=NA, cex.lab=1.15, cex.main=1.25))
-  axis(side=1, at=c(1,2), labels = c("K-means", "Ward's D"))
+  axis(side=1, at=c(1,2), labels = c("KCA", "Ward's D"))
   axis(side=2, at=seq(0.2,0.92,0.1))
 }
 
@@ -144,8 +144,9 @@ panel.repro.plot %<a-%{
 }
 
 ## Print panel plot of reproducibility indices ----------------------------------------------------------------------------
+pdf("Output/Fig.Panel_ID_Alg.pdf", height=5, width=7)
 panel.repro.plot
-
+dev.off()
 
 ## END OF SYNTAX ##
 
