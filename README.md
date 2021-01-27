@@ -18,7 +18,7 @@ perception scores using a data-driven clustering approach.
 - *wardD* - ward's minimum variance cluster algorithm
 
 
-### List of Required Packges $ Purpose(s)
+### List of Required Packges and their Purpose(s)
 
 - *dplyr*      for data manipulation
 - *pryr*       for storing plot objects (sections of R code) in base R
