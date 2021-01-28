@@ -10,7 +10,7 @@
 
 ## Use a random number generator to set.seed() -------------------------------------------------------------------------
 sample(10000,1) # 2468
-N<-2468
+N<-5793
 
 ## Create a list of Ck values for each of the following indices --------------------------------------------------------  
 Cks<-2:10
@@ -89,7 +89,7 @@ dev.off()
 
 ## Calculate Gap Statistic using clusGap function, for any given Ck --------------------
 ## NOTE: May see time lag when running, since function relies on bootstrap sampling
-set.seed(N)
+set.seed(123)
 gap.dat<-clusGap(mydata1, kmeans, nstart=50,
                  K.max = Cks[9], B=50, verbose = FALSE) 
 

@@ -104,43 +104,52 @@ saveRDS(cramv.dat, file = "Output/Dat.CramV.rda")
 #=======================================================================================================================
 
 ## Convert each matrix to long format and "alg" (algorithm) to a factor var --------------------------------------------
-ari.l.dat<-reshape(as.data.frame(ari.dat), varying = list(colnames(ari.dat)[1:9]),
+ari_long.dat<-reshape(as.data.frame(ari.dat), varying = list(colnames(ari.dat)[1:9]),
                    timevar = "Ck", v.names = "ARI", direction = "long")
-cramv.l.dat<-reshape(as.data.frame(cramv.dat), varying = list(colnames(cramv.dat)[1:9]),
+cramv_long.dat<-reshape(as.data.frame(cramv.dat), varying = list(colnames(cramv.dat)[1:9]),
                      timevar = "Ck", v.names = "CramV", direction = "long")
 
 
+## Calculate mean index for each approach (1=KCA; 2=ward's D) 
+ari_means <- lapply(1:2, function(x){mean(ari_long.dat$ARI[ari_long.dat$alg==x])})  
+cramv_means <- lapply(1:2, function(x){mean(cramv_long.dat$CramV[cramv_long.dat$alg==x])})  
+
+
 ## A. Adjusted Rand Index ----------------------------------------------------------------------------------------------
-ari.sum.plot %<a-% {
-  with(ari.l.dat,
+ari.plot %<a-% {
+  with(ari_long.dat,
        boxplot(ARI~alg, col=Greys, frame=T, axes=F, ylim=c(0,0.9),
                boxwex = 0.5, varwidth=F, ylab="ARI",
                xlab=NA, cex.lab=1.15, cex.main=1.25))
   axis(side=1, at=c(1,2), labels = c("KCA", "Ward's D"))
   axis(side=2, at=seq(0,0.9,0.1))
+  points(1:2, ari_means, pch=9, cex=1.5)
+  legend("topright", legend="Mean ARI",pch=9, pt.cex = 1.15, cex = 0.8)
   }
 
 ## Print ari summary box plot ------------------------------------------------------------------------------------------
-ari.sum.plot
+ari.plot
 
 ## B. Cramer’s V -------------------------------------------------------------------------------------------------------
-cramv.sum.plot %<a-% {
+cramv.plot %<a-% {
   with(cramv.l.dat,
        boxplot(CramV~alg, col=Greys, frame=T, axes=F, ylim=c(0.2,0.92),
                boxwex = 0.5, varwidth=F, ylab="Cramer's V",
                xlab=NA, cex.lab=1.15, cex.main=1.25))
   axis(side=1, at=c(1,2), labels = c("KCA", "Ward's D"))
   axis(side=2, at=seq(0.2,0.92,0.1))
+  points(1:2, cramv_means, pch=9, cex=1.5)
+  legend("topright", legend = "Mean Cramer's V", pch=9, pt.cex=1.15, cex=0.8)
 }
 
 ## Print CramV Summary Box Plot ----------------------------------------------------------------------------------------
-cramv.sum.plot
+cramv.plot
 
 ## Create 2 Panel Figure -----------------------------------------------------------------------------------------------
 panel.repro.plot %<a-%{
   par(mar=c(5.1,5.1,4.1,2.1), mfrow=c(1,2))
-  ari.sum.plot
-  cramv.sum.plot
+  ari.plot
+  cramv.plot
 }
 
 ## Print panel plot of reproducibility indices ----------------------------------------------------------------------------

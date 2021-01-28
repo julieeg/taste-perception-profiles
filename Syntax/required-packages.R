@@ -47,7 +47,7 @@ lapply(list.of.packages, require, character.only=T)
 #####################################################################################################################
 
 ## Read in data & save data as simdata ------------------------------------------------------------------------------
-simdata <- read.csv("Raw Data File/Supplemental_Data.csv", header = TRUE, stringsAsFactors = FALSE)
+simdata <- read.csv("Raw Data/Supplemental_Data.csv", header = TRUE, stringsAsFactors = FALSE)
 
 ## Drop “ID” column and save as mydata ------------------------------------------------------------------------------
 mydata <- simdata %>% select(sweet, 
