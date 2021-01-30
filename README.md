@@ -21,6 +21,7 @@ perception scores using a data-driven clustering approach.
 ### List of Required Packges and their Purpose(s)
 
 - *dplyr*      for data manipulation
+- *tidyverse*  for data manipulation
 - *pryr*       for storing plot objects (sections of R code) in base R
 - *plyr*       for renaming objects 
 - *class*      for k-nearest neighbors  
