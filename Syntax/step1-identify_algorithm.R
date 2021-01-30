@@ -35,6 +35,8 @@ mydata1<-mydata[,1:5]
 
 ## write function to run SHCV for any given cluster algorithm and Ck ---------------------------------------------------
 shcv.fun<-function(data, Ck, FUN){
+  # Set.seed to ensure figures are replicatable
+  set.seed(123, kind="default")
   # Create temporary matrix to store data; 20 rows (20 estimates for each index) x 2 cols (1 for each index)
   temp<-matrix(NA,20,2, dimnames = list(c(1:20), c(paste("ARI.", Ck, sep=""), 
                                                    paste("CramV.", Ck, sep=""))))
@@ -87,7 +89,6 @@ cramv.dat<-matrix(c(rep(1,20), rep(2,20)),40,10,
 
 ## Use for loop to run SHCV for each index, for Cks from 2:10 -----------------------------------------------------------
 for (Ck in Cks){
-  set.seed(2468)
   temp.kca<-shcv.fun(mydata1, Ck, kca.fun)  
   temp.wardD<-shcv.fun(mydata1, Ck, wardD.fun)  
   ari.dat[,Ck-1]<-cbind(temp.kca[,1], temp.wardD[,1])
@@ -120,11 +121,11 @@ ari.plot %<a-% {
   with(ari_long.dat,
        boxplot(ARI~alg, col=Greys, frame=T, axes=F, ylim=c(0,0.9),
                boxwex = 0.5, varwidth=F, ylab="ARI",
-               xlab=NA, cex.lab=1.15, cex.main=1.25))
-  axis(side=1, at=c(1,2), labels = c("KCA", "Ward's D"))
-  axis(side=2, at=seq(0,0.9,0.1))
+               xlab=NA, cex.lab=1.5))
+  axis(side=1, at=c(1,2), labels = c("KCA", "Ward's D"), cex.axis=1.25)
+  axis(side=2, at=seq(0,0.9,0.1), cex.axis=1.25)
   points(1:2, ari_means, pch=9, cex=1.5)
-  legend("topright", legend="Mean ARI",pch=9, pt.cex = 1.15, cex = 0.8)
+  legend("topright", legend = " Mean ARI", pch=9, pt.cex=1.25, cex=1)
   }
 
 ## Print ari summary box plot ------------------------------------------------------------------------------------------
@@ -132,14 +133,14 @@ ari.plot
 
 ## B. Cramer’s V -------------------------------------------------------------------------------------------------------
 cramv.plot %<a-% {
-  with(cramv.l.dat,
-       boxplot(CramV~alg, col=Greys, frame=T, axes=F, ylim=c(0.2,0.92),
+  with(cramv_long.dat,
+       boxplot(CramV~alg, col=Greys, frame=T, axes=F, ylim=c(0.2,0.95), 
                boxwex = 0.5, varwidth=F, ylab="Cramer's V",
-               xlab=NA, cex.lab=1.15, cex.main=1.25))
-  axis(side=1, at=c(1,2), labels = c("KCA", "Ward's D"))
-  axis(side=2, at=seq(0.2,0.92,0.1))
+               xlab=NA, cex.lab=1.5))
+  axis(side=1, at=c(1,2), labels = c("KCA", "Ward's D"), cex.axis=1.25)
+  axis(side=2, at=seq(0.2,0.95,0.1), cex.axis=1.25)
   points(1:2, cramv_means, pch=9, cex=1.5)
-  legend("topright", legend = "Mean Cramer's V", pch=9, pt.cex=1.15, cex=0.8)
+  legend("topright", legend = "Mean Cramer's V", pch=9, pt.cex=1.25, cex=1)
 }
 
 ## Print CramV Summary Box Plot ----------------------------------------------------------------------------------------
@@ -147,13 +148,13 @@ cramv.plot
 
 ## Create 2 Panel Figure -----------------------------------------------------------------------------------------------
 panel.repro.plot %<a-%{
-  par(mar=c(5.1,5.1,4.1,2.1), mfrow=c(1,2))
+  par(mar=c(5.1,5.1,2.1,2.1), mfrow=c(1,2))
   ari.plot
   cramv.plot
 }
 
 ## Print panel plot of reproducibility indices ----------------------------------------------------------------------------
-pdf("Output/Fig.Panel_ID_Alg.pdf", height=5, width=7)
+pdf("Output/Fig.Step1-Alg_Reproduc.pdf", height=6, width=10)
 panel.repro.plot
 dev.off()
 

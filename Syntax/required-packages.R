@@ -6,6 +6,7 @@
 
 ## Create a list of all required packages ----------------------------------------------------------------------------
 list.of.packages <- c("dplyr",
+                      "tidyverse",
                       "fmsb",		
                       "cluster",	
                       "pryr",		
@@ -31,6 +32,7 @@ lapply(list.of.packages, require, character.only=T)
 #=====================================================================================================================
 
       # dplyr      for data manipulation
+      # tidyverse  for data manipilation
       # fmsb       for kmeans function
       # cluster    for gap statistic and silhouette plots
       # pryr       for storing plot objects (sections of R code) in base R
@@ -47,14 +49,11 @@ lapply(list.of.packages, require, character.only=T)
 #####################################################################################################################
 
 ## Read in data & save data as simdata ------------------------------------------------------------------------------
-simdata <- read.csv("Raw Data/Supplemental_Data.csv", header = TRUE, stringsAsFactors = FALSE)
+mydata <- read.csv("Raw Data/Simulated_Data.csv", header = TRUE, stringsAsFactors = FALSE)
 
 ## Drop “ID” column and save as mydata ------------------------------------------------------------------------------
-mydata <- simdata %>% select(sweet, 
-                             salt,
-                             sour,
-                             bitter,
-                             umami)
+mydata <- mydata %>% 
+  select(-"X") 
 
 ## Create "total taste score” as the sum of all 5 perception scores --------------------------------------------------
 mydata$tot_taste <- with(mydata, (sweet+salt+sour+bitter+umami))
