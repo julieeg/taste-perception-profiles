@@ -406,14 +406,14 @@ profs.plot %<a-% {
 ## 1. Calinski-Harabasz Index ------------------------------------------------------------------------------------------
 # Run NbClust to compute CH over the range of Cks 
 set.seed(123, kind = "default")
-ch.dat<-NbClust(data=mydata1, distance = "euclidean", min.nc = 2, max.nc = 10, 
+ch.dat<-NbClust(data=mydata[,1:5], distance = "euclidean", min.nc = 2, max.nc = 10, 
                 method = "kmeans", index = "ch")
 
 
 ## 2. Davies-Bouldin Index ---------------------------------------------------------------------------------------------
 # Run NbClust to compute DB over the range of Cks
 set.seed(123, kind = "default")
-db.dat<-NbClust(data=mydata1, distance = "euclidean", min.nc = 2, max.nc = 10, 
+db.dat<-NbClust(data=mydata[,1:5], distance = "euclidean", min.nc = 2, max.nc = 10, 
                 method = "kmeans", index = "db")
 
 
@@ -434,7 +434,7 @@ print(valid.dat)
 jac.fun<-function(Ck){
   # Calculate & store JI parameters for any given Ck
   set.seed(123, kind = "default")
-  temp<-clusterboot(mydata1, clustermethod = kmeansCBI, nstart=50, k=Ck, B=100, count=F)
+  temp<-clusterboot(mydata[,1:5], clustermethod = kmeansCBI, nstart=50, k=Ck, B=100, count=F)
   
   # Save cluster assignment, cluster characteristics (perception scores) & JI as a "list" for each Ck
   list(prof.assign = temp$result$partition,
@@ -454,7 +454,7 @@ for (i in 1:9){
 }
 
 ## Aggregate into a table and save ------------------------------------------------------------------------------------
-jac_all.dat <- matrix(NA, sum(2:10), 7, dimnames=list(NULL, c("Ck", names(mydata1), "JI")))
+jac_all.dat <- matrix(NA, sum(2:10), 7, dimnames=list(NULL, c("Ck", names(mydata[,1:5]), "JI")))
 for (i in 1:9){
   if (i == 1){rows = 1:2} else{rows = (sum(2:i)+1) : (sum(2:(i+1)))}
   jac_all.dat[rows,]<-jac.sum.dat[[i]]$jac.dat
