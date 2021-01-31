@@ -153,11 +153,6 @@ for (Ck in Cks){
 }
 
 
-## save ari.dat and cramv.dat as .rda files ----------------------------------------------------------------------------
-saveRDS(as.data.frame(ari.dat), file = "Output/Dat.ARI.rda")
-saveRDS(cramv.dat, file = "Output/Dat.CramV.rda")
-
-
 #=======================================================================================================================
 ## Visualize data using side-by-side boxplot
 #=======================================================================================================================
@@ -187,25 +182,23 @@ cramv_means <- lapply(1:2, function(x){
 
 ## A. Create ARI Plot  ----------------------------------------------------------------------------------------------
 ari.plot %<a-% {
-  with(ari_long.dat,
-       boxplot(ARI~alg, col=Greys, frame=T, axes=F, ylim=c(0,0.9),
+  boxplot(ari_long.dat$ARI~ari_long.dat$alg, col=greys1, frame=T, axes=F, ylim=c(0,0.9),
                boxwex = 0.5, varwidth=F, ylab="ARI",
-               xlab=NA, cex.lab=1.5))
+               xlab=NA, cex.lab=1.5)
   axis(side=1, at=c(1,2), labels = c("KCA", "Ward's D"), cex.axis=1.25)
   axis(side=2, at=seq(0,0.9,0.1), cex.axis=1.25)
   points(1:2, ari_means, pch=9, cex=1.5)
   legend("topright", legend = " Mean ARI", pch=9, pt.cex=1.25, cex=1)
-}; plot(ari.plot)
+}
 
 ## View ari summary box plot ------------------------------------------------------------------------------------------
 ari.plot
 
 ## B. Cramer’s V -------------------------------------------------------------------------------------------------------
 cramv.plot %<a-% {
-  with(cramv_long.dat,
-       boxplot(CramV~alg, col=Greys, frame=T, axes=F, ylim=c(0.2,0.95), 
+  boxplot(cramv_long.dat$CramV~cramv_long.dat$alg, col=greys1, frame=T, axes=F, ylim=c(0.2,0.95), 
                boxwex = 0.5, varwidth=F, ylab="Cramer's V",
-               xlab=NA, cex.lab=1.5))
+               xlab=NA, cex.lab=1.5)
   axis(side=1, at=c(1,2), labels = c("KCA", "Ward's D"), cex.axis=1.25)
   axis(side=2, at=seq(0.2,0.95,0.1), cex.axis=1.25)
   points(1:2, cramv_means, pch=9, cex=1.5)
@@ -221,12 +214,6 @@ panel.repro.plot %<a-%{
   ari.plot
   cramv.plot
 }
-
-## Print panel plot of reproducibility indices ----------------------------------------------------------------------------
-pdf("Output/Fig.Step1-Alg_Reproduc.pdf", height=6, width=10)
-panel.repro.plot
-dev.off()
-
 
 
 ########################################################################################################################
@@ -269,13 +256,10 @@ elbow_inset.plot %<a-% {
        cex.lab=1, xlab = " ", ylab=" ", ylim = c(1700,2600))
   axis(side=1, at=seq(2,5,1), cex.axis=0.8, padj = -1)
   axis(side=2, at=seq(1700,2600,200), cex.axis=0.8, padj=0.5)
-}; elbow_inset.plot
+}
 
-
-# Save plot as .pdf to "Output" folder ---------------------------------------------------------------------------------
-pdf("Output/Fig.Step2-Ck_Elbow.pdf", height = 6, width = 6.5)
+# View plot
 elbow_inset.plot
-dev.off()
 
 
 #=======================================================================================================================
@@ -301,11 +285,8 @@ sil.plot %<a-%{
   axis(side=1, at=seq(3,9,2), cex.axis=1.25)
 }; sil.plot
 
-## Save sil.plot as .pdf -----------------------------------------------------------------------------------------------
-pdf("Output/Fig.Step2-Ck_Sil.pdf")
+## View 
 sil.plot
-dev.off()
-
 
 #=======================================================================================================================
 ## C. Create Gap Statistic Plot 
@@ -328,11 +309,8 @@ gap.plot %<a-%{
 }; gap.plot
 
 
-## save gap.plot as .pdf -----------------------------------------------------------------------------------------------
-pdf("Output/Fig.Step2-Ck_Gap.pdf")
+## View plot
 gap.plot
-dev.off()
-
 
 
 ########################################################################################################################
@@ -361,20 +339,20 @@ lower<-function(x){mean(x)-sd(x)}
 upper<-function(x){mean(x)+sd(x)}
 
 # Use lower/upper functions to compile data 
-cohort.sum.dat<-rbind(upper=sapply(mydata, upper), 
-                      lower=sapply(mydata, lower), 
-                      mean=sapply(mydata, mean))
+cohort.sum.dat<-rbind(upper=sapply(mydata[,1:5], upper), 
+                      lower=sapply(mydata[,1:5], lower), 
+                      mean=sapply(mydata[,1:5], mean))
 
 
 ## Summarize mean perception for each profile via for loop -------------------------------------------------------------
 # Create empty matrix to store results 
 prof.sum.dat<-matrix(NA, Ck, 5, # dimensions: 4 rows (1 per profile) 5 columns ( 1 per taste)
                      dimnames = list(paste("prof", 1:Ck, sep=""), # labels rows as prof_#
-                                     names(mydata)))  #labels columns with tastes
+                                     names(mydata[,1:5])))  #labels columns with tastes
 
 # Run via for loop and sapply
-for (Ck in 1:Ck){ & sapply
-  prof.sum.dat[Ck,]<-sapply(mydata[mydata$profile==Ck,], mean) # For Ck==each profile, tabulate mean for each taste
+for (Ck in 1:Ck){
+  prof.sum.dat[Ck,]<-sapply(mydata[mydata$profile==Ck,1:5], mean) # For Ck==each profile, tabulate mean for each taste
 }
 
 
@@ -405,7 +383,7 @@ prof_plot.fun = function(Ck){
   # Create spider plot to overlay
   radarchart(data, maxmin=T, caxislabels = NA, seg=5,pty=NA, plwd = c(2,2,3,6), plty=c(1,1,1,1), 
              pcol= c(greys2[1], greys2[1], greys2[2], "#000000"), cglcol = "grey",
-             axislabcol = "black", cglwd = 1, cglty = 3, vlcex = 2.5)
+             axislabcol = "black", cglwd = 1, cglty = 3, vlcex = 1)
 }
 
 
@@ -415,12 +393,6 @@ profs.plot %<a-% {
     (prof_plot.fun(i))
   }
 }; profs.plot
-
-## Save plots as .pdf --------------------------------------------------------------------------------------------------
-pdf("Output/Fig.Step3-Plot_Profs.pdf", height = 7.5, width = 7.5)
-par(mar=c(3.1, 1.1, 3.1, 0.1))
-profs.plot
-dev.off()
 
 
 ########################################################################################################################
@@ -453,10 +425,6 @@ dimnames(valid.dat)<-list(c(paste(2:10)),c("CH", "DB"))
 ## View & save data.frame ----------------------------------------------------------------------------------------------
 # View
 print(valid.dat)
-
-#Save as .rda
-saveRDS(valid.dat, file="Output/Tab.Step5-Validity.rda")
-
 
 #=======================================================================================================================
 ## Cluster Stability (Jaccard Similarity Index, JI)
@@ -492,21 +460,7 @@ for (i in 1:9){
   jac_all.dat[rows,]<-jac.sum.dat[[i]]$jac.dat
 }
 
-## Save JI data as .rda file -----------------------------------------------------------------------------------------
-saveRDS(jac_all.dat, file="Output/Dat.JI.rda")
-
-
 ## END OF SYNTAX ## 
 
 # Last Updated: 2020-01-2019 By: Julie E. Gervis
-
-
-
-
-
-
-
-
-
-
 
