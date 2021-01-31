@@ -244,7 +244,7 @@ Wk.fun<-function(Ck){
 }
 
 
-## Run Wk.fun over the range of Ck & visualize to identidy Elbow -------------------------------------------------------------------------------------  
+## Run Wk.fun over the range of Ck & visualize to identidy Elbow -------------------------------------------------------
 Wk.dat<-sapply(Cks, Wk.fun) # Generate data
 plot(Cks, Wk.dat, type="b", pch=19) # Visualize: Elbow @ Ck = 4
 
@@ -254,7 +254,7 @@ Ck_inset <- 2:5
 Wk_inset.dat<-sapply(Ck_inset, Wk.fun)
 
 
-## Plot Wk.dat, "bind" & view ---------------------------------------------------------------------------------------------
+## Plot Wk.dat, "bind" & view ------------------------------------------------------------------------------------------
 elbow_inset.plot %<a-% {
   par(mfrow=c(1,1), mar=c(5.1,5.1,1.1,2.1))
   plot(Cks, Wk.dat, axes=F, type="b", pch=19, frame = T,
@@ -318,7 +318,7 @@ gap.dat<-clusGap(mydata, kmeans, nstart=25,
                  K.max = 10, B=50, verbose = FALSE) 
 
 
-# Plot gap statistic, "bind" & view --------------------------------------------------------------------------------------------
+# Plot gap statistic, "bind" & view ------------------------------------------------------------------------------------
 gap.plot %<a-%{
   plot(gap.dat$Tab[2:10,3], type="b", pch=19, frame=T, 
        xlab=expression("Number of Clusters (C"[k]*")"), 
@@ -328,7 +328,7 @@ gap.plot %<a-%{
 }; gap.plot
 
 
-## save gap.plot as .pdf ---------------------------------------------------------------------------------------------------
+## save gap.plot as .pdf -----------------------------------------------------------------------------------------------
 pdf("Output/Fig.Step2-Ck_Gap.pdf")
 gap.plot
 dev.off()
@@ -354,7 +354,7 @@ mydata$profile<-as.factor(prof.dat) #Add cluster assignments to mydata
 ## Aggregate mean (SD) perception scores for each taste per profile and for the overall cohort
 #=======================================================================================================================
 
-## Summarize mean (+/- 1SD) for the overall cohort -----------------------------------------------------------------------
+## Summarize mean (+/- 1SD) for the overall cohort ---------------------------------------------------------------------
 
 # Write functions to calculate lower (-1SD) and upper (+1SD) values
 lower<-function(x){mean(x)-sd(x)}
@@ -374,7 +374,7 @@ prof.sum.dat<-matrix(NA, Ck, 5, # dimensions: 4 rows (1 per profile) 5 columns (
 
 # Run via for loop and sapply
 for (Ck in 1:Ck){ & sapply
-  prof.sum.dat[Ck,]<-sapply(mydata[mydata$profile==Ck,], mean) # For Ck==each profile (1:4), tabulate mean for each taste
+  prof.sum.dat[Ck,]<-sapply(mydata[mydata$profile==Ck,], mean) # For Ck==each profile, tabulate mean for each taste
 }
 
 
@@ -409,14 +409,14 @@ prof_plot.fun = function(Ck){
 }
 
 
-## Plot radar plots for each taste perception profile, "bind" & view----------------------------------
+## Plot radar plots for each taste perception profile, "bind" & view----------------------------------------------------
 profs.plot %<a-% {
   for (i in 1:Ck){
     (prof_plot.fun(i))
   }
 }; profs.plot
 
-## Save plots as .pdf -------------------------------------------------------------------
+## Save plots as .pdf --------------------------------------------------------------------------------------------------
 pdf("Output/Fig.Step3-Plot_Profs.pdf", height = 7.5, width = 7.5)
 par(mar=c(3.1, 1.1, 3.1, 0.1))
 profs.plot
