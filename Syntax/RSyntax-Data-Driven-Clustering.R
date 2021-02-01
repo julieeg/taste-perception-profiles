@@ -45,7 +45,7 @@ lapply(list.of.packages, require, character.only=T)
 
 ## Read in data & save as mydata 
 ## Simulated_Data = dataset containing taste perception scores for sweet, salt, sour, bitter & umami and an ID var (1:400)
-mydata <- read.csv("Raw Data/Simulated_Data.csv", header = TRUE, stringsAsFactors = FALSE)
+mydata <- read.csv("../Simulated_Data/Simulated_Data.csv", header = TRUE, stringsAsFactors = FALSE)
 
 
 ## Drop “ID” column 
@@ -391,7 +391,7 @@ prof_plot.fun = function(Ck){
   # Create spider plot to overlay
   radarchart(data, maxmin=T, caxislabels = NA, seg=5,pty=NA, plwd = c(2,2,3,6), plty=c(1,1,1,1), 
              pcol= c(greys2[1], greys2[1], greys2[2], "#000000"), cglcol = "grey",
-             axislabcol = "black", cglwd = 1, cglty = 3, vlcex = 1)
+             axislabcol = "black", cglwd = 1, cglty = 3, vlcex = 2)
 }
 
 
