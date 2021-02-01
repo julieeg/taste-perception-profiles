@@ -5,15 +5,15 @@
 
 ## START OF SYNTAX ##
 
-########################################################################################################################
-## Package Installation & Data Preparation
-#######################################################################################################################
+#############################################
+## Package Installation & Data Preparation ##
+#############################################
 
-#=====================================================================================================================
-## Install required packages
-#=====================================================================================================================
+#====================================#
+## Install & load required packages ##
+#====================================#
 
-## Create a list of all required packages ----------------------------------------------------------------------------
+## Create a list of all required packages 
 list.of.packages <- c("dplyr",
                       "tidyverse",
                       "fmsb",		
@@ -27,11 +27,11 @@ list.of.packages <- c("dplyr",
                       "fpc")
 
 
-## Select packages from list.of.packages that are not already installed ----------------------------------------------
+## Select packages from list.of.packages that are not already installed
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 
 
-## Install new.packages ----------------------------------------------------------------------------------------------
+## Install new.packages 
 if(length(new.packages)){install.packages(new.package)}
 
 
@@ -39,46 +39,47 @@ if(length(new.packages)){install.packages(new.package)}
 lapply(list.of.packages, require, character.only=T)
 
 
-#=====================================================================================================================
-## Read in & prepare data for analysis
-#=====================================================================================================================
+#=======================================#
+## Read in & prepare data for analysis ##
+#=======================================#
 
-## Read in data & save data as simdata -------------------------------------------------------------------------------
+## Read in data & save as mydata 
+## Simulated_Data = dataset containing taste perception scores for sweet, salt, sour, bitter & umami and an ID var (1:400)
 mydata <- read.csv("Raw Data/Simulated_Data.csv", header = TRUE, stringsAsFactors = FALSE)
 
 
-## Drop “ID” column and save as mydata --------------------------------------------------------------------------------
+## Drop “ID” column 
 mydata <- mydata %>% 
   select(-"X") 
 
-# Check data dimenstions & structure ----------------------------------------------------------------------------------
-dim(mydata); str(mydata)
+# Check data dimenstions & structure 
+dim(mydata); str(mydata) #dim: 400 rows, 5 columns, vars are all integers
 
 
-#=======================================================================================================================
-## Housekeeping
-#=======================================================================================================================
+#================#
+## Housekeeping ##
+#================#
 
-## Set plot parameters and margins -------------------------------------------------------------------------------------
+## Set plot parameters and margins 
 par(mfrow=c(1,1), mar=c(5.1,5.1,4.1,2.1), xpd=T)
 
-## Create a list of Ck values to run for each reproducibility index ----------------------------------------------------
+## Create a list of Ck values to run for each reproducibility index 
 Cks<-(2:10)
 
-## Createcolor palette for all plots -------------------------------------------------------------------
+## Create color palette for all plots 
 greys1<-c("#A0A0A0", "#404040")
 greys2<-c("#E1E1E190", "#62626290")
 
 
-########################################################################################################################
-## Step 1: Identify a reproducible cluster algorithm via Split Half Cross Validation (SHCV)
-########################################################################################################################
+##############################################################################################
+## Step 1: Identify a reproducible cluster algorithm via Split Half Cross Validation (SHCV) ##
+##############################################################################################
 
-#=======================================================================================================================
-## Write functions to run SHCV for any given cluster algorithm (KCA or Ward's D) 
-#=======================================================================================================================
+#=================================================================================#
+## Write functions to run SHCV for any given cluster algorithm (KCA or Ward's D) ## 
+#=================================================================================#
 
-## Write functions to print cluster solutions for each cluster algorithm, for any Ck -----------------------------------
+## Write functions to print cluster solutions for each cluster algorithm, for any Ck 
 # KCA
 kca.fun<-function(data, Ck){
   as.numeric(kmeans(data, Ck, nstart=50)$cluster)
@@ -88,7 +89,7 @@ wardD.fun<-function(data, Ck){
   as.numeric(cutree(hclust(dist(data), method = "ward.D"), Ck))
 }
 
-## write function to run SHCV for any given cluster algorithm and Ck ---------------------------------------------------
+## Write SHCV function
 shcv.fun<-function(data, Ck, FUN){
   # Set.seed to ensure results are replicatable
   set.seed(123, kind="default")
@@ -132,19 +133,21 @@ shcv.fun<-function(data, Ck, FUN){
 }
 
 
-#=======================================================================================================================
-## Run SHCV for each Ck; store results separately for each index 
-#=======================================================================================================================
+#=================================================================#
+## Run SHCV for each Ck; store results separately for each index ## 
+#=================================================================#
 
-## create matrices for storing results ---------------------------------------------------------------------------------
-## Dimensions: 40 rows (20 for each algorithm) x 10 columns (1 per Ck, from 2-10)
+## create matrices for storing results 
+## matrices: 40 rows (20 for each algorithm) x 10 columns (1 per Ck, from 2-10)
+# ARI
 ari.dat<-matrix(c(rep(1,20), rep(2,20)),40,10, 
                 dimnames = list(1:40, c(paste("Ck.", 2:10, sep=""), "alg")))
+# CramV
 cramv.dat<-matrix(c(rep(1,20), rep(2,20)),40,10, 
                   dimnames = list(1:40, c(paste("Ck.", 2:10, sep=""), "alg")))
 
 
-## Use for loop to run SHCV for each index, for Cks from 2:10 -----------------------------------------------------------
+## Use for loop to run SHCV for each index, for Cks from 2:10 & compile in
 for (Ck in Cks){
   temp.kca<-shcv.fun(mydata, Ck, kca.fun)  # Run shcv for KCA (output = 20 row x 2 col)
   temp.wardD<-shcv.fun(mydata, Ck, wardD.fun)   # Run shcv for Ward's D (output = 20 rows x 2 col)
@@ -153,13 +156,13 @@ for (Ck in Cks){
 }
 
 
-#=======================================================================================================================
-## Visualize data using side-by-side boxplot
-#=======================================================================================================================
+#=============================================#
+## Visualize data using side-by-side boxplot ##
+#=============================================#
 
-## Prepare data for plot by converting each matrix to long format ------------------------------------------------------
+## Prepare data for plot by converting each matrix to long format
 # ARI
-ari_long.dat<-reshape(as.data.frame(ari.dat),  # choose ari.dat
+ari_long.dat<-reshape(as.data.frame(ari.dat),  # input as data.frame
                       varying = list(colnames(ari.dat)[1:9]), # columns that will be collapsed into long form
                       timevar = "Ck", # Var in long form that differentiates the ARI values
                       v.names = "ARI", # name of new var in long form that includes the vars being collapsed
@@ -172,17 +175,20 @@ cramv_long.dat<-reshape(as.data.frame(cramv.dat),
                         direction = "long")
 
 
-## Calculate mean value for both indices, for each approach using lapply (KCA=1; wardD=2) ------------------------------
-ari_means <- lapply(1:2, function(x){
-  mean(ari_long.dat$ARI[ari_long.dat$alg==x])})  # ARI
+## Calculate mean values of each index by approach to overlay on boxplot
+# ARI
+ari_means <- lapply(1:2, function(x)
+  mean(ari_long.dat$ARI[ari_long.dat$alg==x]))  
 
-cramv_means <- lapply(1:2, function(x){
-  mean(cramv_long.dat$CramV[cramv_long.dat$alg==x])})  # CramV 
+# CramV
+cramv_means <- lapply(1:2, function(x)
+  mean(cramv_long.dat$CramV[cramv_long.dat$alg==x]))  
 
 
-## A. Create ARI Plot  ----------------------------------------------------------------------------------------------
-ari.plot %<a-% {
-  boxplot(ari_long.dat$ARI~ari_long.dat$alg, col=greys1, frame=T, axes=F, ylim=c(0,0.9),
+## Create BoxPlots, "bind" and visualize
+# ARI
+ari.plot %<a-% { #Use %<a-% to bind plot to "ari.plot" 
+  boxplot(ari_long.dat$ARI~ari_long.dat$alg, col=greys1, frame=T, axes=F, ylim=c(0,0.9), #Set plot parameters:
                boxwex = 0.5, varwidth=F, ylab="ARI",
                xlab=NA, cex.lab=1.5)
   axis(side=1, at=c(1,2), labels = c("KCA", "Ward's D"), cex.axis=1.25)
@@ -191,10 +197,10 @@ ari.plot %<a-% {
   legend("topright", legend = " Mean ARI", pch=9, pt.cex=1.25, cex=1)
 }
 
-## View ari summary box plot ------------------------------------------------------------------------------------------
+## View ari box plot 
 ari.plot
 
-## B. Cramer’s V -------------------------------------------------------------------------------------------------------
+## B. Cramer’s V 
 cramv.plot %<a-% {
   boxplot(cramv_long.dat$CramV~cramv_long.dat$alg, col=greys1, frame=T, axes=F, ylim=c(0.2,0.95), 
                boxwex = 0.5, varwidth=F, ylab="Cramer's V",
@@ -205,10 +211,10 @@ cramv.plot %<a-% {
   legend("topright", legend = "Mean Cramer's V", pch=9, pt.cex=1.25, cex=1)
 }
 
-## Print CramV Summary Box Plot ----------------------------------------------------------------------------------------
+## View CramV box plot 
 cramv.plot
 
-## Create 2 Panel Figure -----------------------------------------------------------------------------------------------
+## Create 2 Panel Figure 
 panel.repro.plot %<a-%{
   par(mar=c(5.1,5.1,2.1,2.1), mfrow=c(1,2))
   ari.plot
@@ -216,22 +222,22 @@ panel.repro.plot %<a-%{
 }
 
 
-########################################################################################################################
-## Step 2: Determine the optimal number of clusters (Ck) for the data
-########################################################################################################################
+#######################################################################
+## Step 2: Determine the optimal number of clusters (Ck) in the data ##
+#######################################################################
 
-#=======================================================================================================================
-## A. Examine total within-cluster variation across Cks (Wk) via Elbow Plot 
-#=======================================================================================================================
+#=========================================================================#
+## Examine total within-cluster variation (Wk) across Cks via Elbow Plot ## 
+#=========================================================================#
 
-## Write a function to calculate the Wk, for any Ck --------------------------------------------------------------------
+## Write a function to calculate the Wk, for any Ck 
 Wk.fun<-function(Ck){
   set.seed(123, kind = "default") # choose a random set.seed, so results can be replicated
   kmeans(mydata, Ck, nstart=50)$tot.withinss
 }
 
 
-## Run Wk.fun over the range of Ck & visualize to identidy Elbow -------------------------------------------------------
+## Run Wk.fun over the range of Ck & visualize to identify Elbow 
 Wk.dat<-sapply(Cks, Wk.fun) # Generate data
 plot(Cks, Wk.dat, type="b", pch=19) # Visualize: Elbow @ Ck = 4
 
@@ -241,7 +247,7 @@ Ck_inset <- 2:5
 Wk_inset.dat<-sapply(Ck_inset, Wk.fun)
 
 
-## Plot Wk.dat, "bind" & view ------------------------------------------------------------------------------------------
+## Plot Wk.dat, "bind" & view 
 elbow_inset.plot %<a-% {
   par(mfrow=c(1,1), mar=c(5.1,5.1,1.1,2.1))
   plot(Cks, Wk.dat, axes=F, type="b", pch=19, frame = T,
@@ -258,24 +264,24 @@ elbow_inset.plot %<a-% {
   axis(side=2, at=seq(1700,2600,200), cex.axis=0.8, padj=0.5)
 }
 
-# View plot
+# View Elbow plot
 elbow_inset.plot
 
 
-#=======================================================================================================================
-## B. Create Average Silhouette Statistic Plot 
-#=======================================================================================================================
+#===============================================#
+## B. Create Average Silhouette Statistic Plot ##
+#===============================================#
 
-## Write function to calculate average silhouette, for any given Ck ----------------------------------------------------
+## Write function to calculate average silhouette, for any given Ck 
 sil.fun<-function(Ck){
   set.seed(123, kind = "default")
   avg.sil<-mean(silhouette(kmeans(mydata, Ck, nstart=50)$cluster, 
                            dist(mydata))[,3])}
 
-## Run sil.fun over the range of Ck ------------------------------------------------------------------------------------
+## Run sil.fun over the range of Ck 
 sil.dat<-sapply(Cks, sil.fun)
 
-## Plot sil.dat, "bind" & view  ----------------------------------------------------------------------------------------
+## Plot sil.dat & bind together
 dev.off() # reset plot parameters from Elbow plot with inset
 sil.plot %<a-%{
   par(mar=c(5.1,5.1,1.1,2.1))
@@ -283,56 +289,56 @@ sil.plot %<a-%{
        xlab = expression("Number of Clusters (C"[k]*")"),
        ylab = "Average Silhouette", cex.lab=1.5, cex.axis = 1.25)
   axis(side=1, at=seq(3,9,2), cex.axis=1.25)
-}; sil.plot
+}
 
-## View 
+## View Silhouette plot 
 sil.plot
 
-#=======================================================================================================================
-## C. Create Gap Statistic Plot 
-#=======================================================================================================================
+#================================#
+## C. Create Gap Statistic Plot ##
+#================================#
 
-## Compile Gap Statistics using clusGap function, for any given Ck -----------------------------------------------------
+## Compile Gap Statistics using clusGap function, for any given Ck 
 ## NOTE: May see time lag when running, since function relies on bootstrap sampling
 set.seed(123, kind = "default")  #set.seed() for repeatability 
 gap.dat<-clusGap(mydata, kmeans, nstart=25,
                  K.max = 10, B=50, verbose = FALSE) 
 
 
-# Plot gap statistic, "bind" & view ------------------------------------------------------------------------------------
+# Plot gap statistic & bind together
 gap.plot %<a-%{
   plot(gap.dat$Tab[2:10,3], type="b", pch=19, frame=T, 
        xlab=expression("Number of Clusters (C"[k]*")"), 
        ylab="Gap Statistic", xlim=c(1,9), axes=F, cex.lab=1.5, cex.axis = 1.25)
   axis(side=1, at=1:9, labels = 2:10, cex.axis=1.25)
   axis(side=2, cex.axis=1.25)
-}; gap.plot
+}
 
 
 ## View plot
 gap.plot
 
 
-########################################################################################################################
-## Step 3: Derive & visualize the taste perception profiles
-########################################################################################################################
+##############################################################
+## Step 3: Derive & visualize the taste perception profiles ##
+##############################################################
 
-#=======================================================================================================================
-## Derive taste perception profiles using KCA with Ck = 4 
-#=======================================================================================================================
+#========================================================#
+## Derive taste perception profiles via KCA with Ck = 4 ## 
+#========================================================#
 
-## Derive & save profile assignments to mydata -------------------------------------------------------------------------
+## Derive & save profile assignments to mydata 
 Ck<-4 # Set Ck as 4, based on results from step 2
 set.seed(123, kind = "default") # set.seed for repeatability
 prof.dat<-kmeans(mydata, Ck, nstart=25)$cluster # run kmeans and extract cluster assignments
 mydata$profile<-as.factor(prof.dat) #Add cluster assignments to mydata
 
 
-#=======================================================================================================================
-## Aggregate mean (SD) perception scores for each taste per profile and for the overall cohort
-#=======================================================================================================================
+#===============================================================================================#
+## Aggregate mean (SD) perception scores for each taste per profile and for the overall cohort ##
+#===============================================================================================#
 
-## Summarize mean (+/- 1SD) for the overall cohort ---------------------------------------------------------------------
+## Summarize mean (+/- 1SD) for the overall cohort 
 
 # Write functions to calculate lower (-1SD) and upper (+1SD) values
 lower<-function(x){mean(x)-sd(x)}
@@ -344,7 +350,7 @@ cohort.sum.dat<-rbind(upper=sapply(mydata[,1:5], upper),
                       mean=sapply(mydata[,1:5], mean))
 
 
-## Summarize mean perception for each profile via for loop -------------------------------------------------------------
+## Summarize mean perception for each profile via for loop 
 # Create empty matrix to store results 
 prof.sum.dat<-matrix(NA, Ck, 5, # dimensions: 4 rows (1 per profile) 5 columns ( 1 per taste)
                      dimnames = list(paste("prof", 1:Ck, sep=""), # labels rows as prof_#
@@ -352,17 +358,19 @@ prof.sum.dat<-matrix(NA, Ck, 5, # dimensions: 4 rows (1 per profile) 5 columns (
 
 # Run via for loop and sapply
 for (Ck in 1:Ck){
-  prof.sum.dat[Ck,]<-sapply(mydata[mydata$profile==Ck,1:5], mean) # For Ck==each profile, tabulate mean for each taste
+  prof.sum.dat[Ck,]<-sapply(
+    mydata[mydata$profile==Ck,1:5], mean) # For Ck==each profile, tabulate mean for each taste
 }
 
 
-#=======================================================================================================================
-## Plot each taste perception profile using Radar Plots
+#========================================================#
+## Plot each taste perception profile using radar plots ##
+#========================================================#
+
 ### Each plot will include the mean perception scores of each taste for the profile and for the cohort overall
 ### +/- 1 SD for the cohort overall will also be included and shaded in gray
-#=======================================================================================================================
 
-## Write function to create radar plot with shading for +/-1 SD --------------------------------------------------------
+## Write function to create radar plot with shading for +/-1 SD 
 par(mar=c(3.1, 1.5, 2.1, 1.5))
 prof_plot.fun = function(Ck){
   
@@ -387,50 +395,55 @@ prof_plot.fun = function(Ck){
 }
 
 
-## Plot radar plots for each taste perception profile, "bind" & view----------------------------------------------------
+## Plot radar plots for each taste perception profile & bind together 
 profs.plot %<a-% {
   for (i in 1:Ck){
     (prof_plot.fun(i))
   }
-}; profs.plot
+}
+
+# View radar plots for each profile
+profs.plot
 
 
-########################################################################################################################
+##################################################
 ## STEP 4: Assess internal validity & stability ##
-########################################################################################################################
+##################################################
 
-#=======================================================================================================================
-## Cluster Validity (Internal Cluster Validity Indices)
-#=======================================================================================================================
+#========================================================#
+## Cluster Validity (Internal Cluster Validity Indices) ##
+#========================================================#
 
-## 1. Calinski-Harabasz Index ------------------------------------------------------------------------------------------
+## 1. Calinski-Harabasz Index 
 # Run NbClust to compute CH over the range of Cks 
 set.seed(123, kind = "default")
 ch.dat<-NbClust(data=mydata[,1:5], distance = "euclidean", min.nc = 2, max.nc = 10, 
                 method = "kmeans", index = "ch")
 
 
-## 2. Davies-Bouldin Index ---------------------------------------------------------------------------------------------
+## 2. Davies-Bouldin Index 
 # Run NbClust to compute DB over the range of Cks
 set.seed(123, kind = "default")
 db.dat<-NbClust(data=mydata[,1:5], distance = "euclidean", min.nc = 2, max.nc = 10, 
                 method = "kmeans", index = "db")
 
 
-## Compile and save internal cluster validity indices (ch.dat, db.dat) -------------------------------------------------
-valid.dat<-data.frame(cbind(as.numeric(ch.dat$All.index), as.numeric(db.dat$All.index)))
+## Compile and save internal cluster validity indices 
+valid.dat<-data.frame(cbind(as.numeric(ch.dat$All.index), 
+                            as.numeric(db.dat$All.index)))
+# Add row and column names
 dimnames(valid.dat)<-list(c(paste(2:10)),c("CH", "DB"))
 
 
-## View & save data.frame ----------------------------------------------------------------------------------------------
+## View & save data.frame 
 # View
 print(valid.dat)
 
-#=======================================================================================================================
-## Cluster Stability (Jaccard Similarity Index, JI)
-#=======================================================================================================================
+#====================================================#
+## Cluster Stability (Jaccard Similarity Index, JI) ##
+#====================================================#
 
-## Write a function to calculate the JI  for any Ck --------------------------------------------------------------------
+## Write a function to calculate the JI  for any Ck 
 jac.fun<-function(Ck){
   # Calculate & store JI parameters for any given Ck
   set.seed(123, kind = "default")
@@ -443,17 +456,17 @@ jac.fun<-function(Ck){
                        JI=round(temp$bootmean, digits=3))) # print JI for each profile
 }
 
-## Run jac.fun using for loop over Ck from 2:10 ------------------------------------------------------------------------
+## Run jac.fun using for loop over Ck from 2:10 
 jac.sum.dat<-lapply(Cks, jac.fun)  
 
 
-# Print cluster characteristics and JI for all clusters with a Ck from 2:10 -------------------------------------------
+# Print cluster characteristics and JI for all clusters with a Ck from 2:10
 for (i in 1:9){
   x<-(jac.sum.dat[[i]]$jac.dat)
   print(x)
 }
 
-## Aggregate into a table and save ------------------------------------------------------------------------------------
+## Aggregate into a table and save 
 jac_all.dat <- matrix(NA, sum(2:10), 7, dimnames=list(NULL, c("Ck", names(mydata[,1:5]), "JI")))
 for (i in 1:9){
   if (i == 1){rows = 1:2} else{rows = (sum(2:i)+1) : (sum(2:(i+1)))}
@@ -462,5 +475,5 @@ for (i in 1:9){
 
 ## END OF SYNTAX ## 
 
-# Last Updated: 2020-01-2019 By: Julie E. Gervis
-
+# Last Updated: 2020-02-01 By: Julie E. Gervis
+                                         
