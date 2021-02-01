@@ -14,17 +14,18 @@
 #====================================#
 
 ## Create a list of all required packages 
-list.of.packages <- c("dplyr",
-                      "tidyverse",
-                      "fmsb",		
-                      "cluster",	
-                      "pryr",		
-                      "NbClust",	
-                      "class",
-                      "fossil",
-                      "rcompanion",
-                      "plyr",
-                      "fpc")
+list.of.packages <- c("dplyr",  # for data manipulation
+                      "tidyverse",  # for data manipulation 
+                      "pryr",  # for binding plot code togehter in base R
+                      "plyr",  # for renaming objects
+                      "class",  # for k-nearest neighbors
+                      "fossil",  # for adjusted rand index (ARI)
+                      "rcompanion",  # for cramer's V (CramV)
+                      "cluster",	# for average silhouette & gap statistics
+                      "fmsb",	 # for radar plots (to visualize taste perception profiles)
+                      "NbClust",  # for internal cluster validity indices
+                      "fpc"  # for stability index (jaccard index)
+                      ) 
 
 
 ## Select packages from list.of.packages that are not already installed
