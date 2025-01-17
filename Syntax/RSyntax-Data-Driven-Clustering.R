@@ -33,7 +33,7 @@ new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"
 
 
 ## Install new.packages 
-if(length(new.packages)){install.packages(new.package)}
+if(length(new.packages)){install.packages(new.packages)}
 
 
 ## Load list.of.packages
